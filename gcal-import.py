@@ -62,6 +62,20 @@ def main():
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
+    all_calendars = service.calendarList().list().execute()
+
+    print("To which calendar do you want to add all events?")
+    cal_counter = 0
+    for calendar in all_calendars['items']:
+        cal_counter += 1
+        print(str(cal_counter) + ': ' + calendar['summary'])
+    input_id = input('ID: ')
+    input_id = int(input_id)
+    if input_id < 1 or input_id > len(all_calendars['items']):
+        raise "unexpected ID " + str(input_id)
+
+    calendar_item = all_calendars['items'][input_id-1]
+
     for dataitem in jsondata:
         desc = dataitem['eventType'] + '\n' + dataitem['lecturer'] + '\n' + dataitem['rooms']
         title = dataitem['subjectName'] + dataitem['subgroups'] + ' (' + dataitem['subjectType'] + ')'
@@ -81,7 +95,7 @@ def main():
             'location': loc
         }
         service.events().insert(
-            calendarId="<YOUR_CALENDAR_ID>",
+            calendarId=calendar_item['id'],
             body=bodyo).execute()
 
 

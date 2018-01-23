@@ -17,7 +17,4 @@ Move this file to your working directory and rename it client_secret.json.
 
 python prerequisite: pip install --upgrade google-api-python-client
 
-# Change your calendar id
 
-To get your calendar id you can use [google api exporter](https://developers.google.com/apis-explorer/#p/calendar/v3/calendar.calendarList.list?_h=1&)
-in gcal-import.py, change '<YOUR_CALENDAR_ID>' to something like 'figop82rc5afs52e32ron68wlk@group.calendar.google.com'
