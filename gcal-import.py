@@ -62,9 +62,6 @@ def main():
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
 
-    now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
-
     for dataitem in jsondata:
         desc = dataitem['eventType'] + '\n' + dataitem['lecturer'] + '\n' + dataitem['rooms']
         title = dataitem['subjectName'] + dataitem['subgroups'] + ' (' + dataitem['subjectType'] + ')'
