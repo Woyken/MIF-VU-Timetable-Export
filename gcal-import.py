@@ -11,7 +11,7 @@ import datetime
 
 import json
 
-jsondata = json.load(open('lectures2018-spring.json', encoding="utf-8"))
+jsondata = json.load(open('exportedLectures.json', encoding="utf-8"))
 
 try:
     import argparse
