@@ -1,12 +1,3 @@
-// ==UserScript==
-// @name     MIF VU Timetable exporter
-// @version  1
-// @grant    none
-// @include  https://mif.vu.lt/timetable/mif/groups/*
-// // @require  https://apis.google.com/js/api.js
-// @grant    unsafeWindow
-// ==/UserScript==
-
 /* 
 * as of time of writing this: 2017-01,
 * Timetable system is populated by javascript in which there's generated json 
@@ -39,47 +30,42 @@
 * }
 */
 
-
-window.addEventListener("load", () => {main();})
-
-function main() {
-  console.log("fetching all lectures list...");
-  var lectureArray = [];
-	var allScripts = document.body.getElementsByTagName("script");
-  for (var i = 0; i < allScripts.length; i++) {
-    var curScriptSearch = allScripts[i].innerHTML;
-    curScriptSearch = curScriptSearch.replace(/\\\n/g, '\n');
-    var jsonStart = 0;
-    while(-1 != jsonStart) {
-      jsonStart = curScriptSearch.search('{([ ]*\r?\n)*.*"title"');
-      if(-1 === jsonStart)
-        break;
-      curScriptSearch = curScriptSearch.substr(jsonStart);
-      var jsonEnd = curScriptSearch.search('\n[ ]*}');
-      var lectureJson = curScriptSearch.substr(0, jsonEnd).replace(/\n/g, '') + '}';
-      var lectureObj = {};
-      try {
-        lectureObj = JSON.parse(lectureJson);
-      }
-      catch(e) {
-        console.log("can't deal with this: " + lectureJson);
-        //return;
-      }
-      try {
-      	lectureObj = ParseLectureXmlPartsToJson(lectureObj);
-      	lectureArray.push(lectureObj);
-      }
-      catch(e) {
-        //console.log("can't parse this:");
-        //console.log(lectureObj);
-      }
-      //console.log("adding lecture");
-      curScriptSearch = curScriptSearch.substr(jsonEnd);
+console.log("fetching all lectures list...");
+var lectureArray = [];
+var allScripts = document.body.getElementsByTagName("script");
+for (var i = 0; i < allScripts.length; i++) {
+  var curScriptSearch = allScripts[i].innerHTML;
+  curScriptSearch = curScriptSearch.replace(/\\\n/g, '\n');
+  var jsonStart = 0;
+  while(-1 != jsonStart) {
+    jsonStart = curScriptSearch.search('{([ ]*\r?\n)*.*"title"');
+    if(-1 === jsonStart)
+      break;
+    curScriptSearch = curScriptSearch.substr(jsonStart);
+    var jsonEnd = curScriptSearch.search('\n[ ]*}');
+    var lectureJson = curScriptSearch.substr(0, jsonEnd).replace(/\n/g, '') + '}';
+    var lectureObj = {};
+    try {
+      lectureObj = JSON.parse(lectureJson);
     }
-	}
-  console.log("found lectures: " + lectureArray.length);
-  console.log("to get output you will need to send this as JSON obj to some storage");
+    catch(e) {
+      console.log("can't deal with this: " + lectureJson);
+      //return;
+    }
+    try {
+      lectureObj = ParseLectureXmlPartsToJson(lectureObj);
+      lectureArray.push(lectureObj);
+    }
+    catch(e) {
+      //console.log("can't parse this:");
+      //console.log(lectureObj);
+    }
+    //console.log("adding lecture");
+    curScriptSearch = curScriptSearch.substr(jsonEnd);
+  }
 }
+console.log("found lectures: " + lectureArray.length);
+displayOverlay();
 
 function ParseLectureXmlPartsToJson(lecture) {
   var newLectureObj = {};
@@ -138,4 +124,85 @@ function ConvertToHtmlElementFromString(str) {
 	var el = document.createElement( 'html' );
   el.innerHTML = str;
   return el;
+}
+
+function displayOverlay() {
+  var overlayElem = document.getElementById('OverlayDisplay-er');
+  if(!overlayElem){
+    createOverlayElements();
+    overlayElem = document.getElementById('OverlayDisplay-er');
+  }
+  var overlayAmountEl = document.getElementById('OverlayDisplay-er-Amount');
+  if(overlayAmountEl)
+    overlayAmountEl.innerHTML = lectureArray.length;
+
+  overlayElem.style.display = "table";
+}
+
+function createOverlayElements() {
+    var outerElem = document.createElement('div');
+    outerElem.style.cssText = 'display: none;position: fixed;height: 100%;width: 100%;background-color: rgba(0,0,0,0.4);z-index: 3000; cursor: pointer;';
+    outerElem.onclick = function() {outerElem.style.display = "none";};
+    outerElem.id = "OverlayDisplay-er";
+
+    var middleElem = document.createElement('div');
+    middleElem.style.cssText = 'display: table-cell;vertical-align: middle;';
+
+    var innerElem = document.createElement('div');
+    innerElem.style.cssText = 'margin-left: auto;margin-right: auto;width: 200px;background-color: azure;';
+    innerElem.innerHTML = '<h1>Collected <em id="OverlayDisplay-er-Amount">1337</em> events.</h1>';
+
+    var claimButton = document.createElement('button');
+    claimButton.onclick = function() {
+      copyTextToClipboard(JSON.stringify(lectureArray));
+    }
+    claimButton.innerText = "Copy to clipboard";
+    
+    innerElem.appendChild(claimButton);
+    middleElem.appendChild(innerElem);
+    outerElem.appendChild(middleElem);
+    document.body.prepend(outerElem);
+  }
+
+function copyTextToClipboard(text) {
+  var textArea = document.createElement("textarea");
+
+  // Place in top-left corner of screen regardless of scroll position.
+  textArea.style.position = 'fixed';
+  textArea.style.top = 0;
+  textArea.style.left = 0;
+
+  // Ensure it has a small width and height. Setting to 1px / 1em
+  // doesn't work as this gives a negative w/h on some browsers.
+  textArea.style.width = '2em';
+  textArea.style.height = '2em';
+
+  // We don't need padding, reducing the size if it does flash render.
+  textArea.style.padding = 0;
+
+  // Clean up any borders.
+  textArea.style.border = 'none';
+  textArea.style.outline = 'none';
+  textArea.style.boxShadow = 'none';
+
+  // Avoid flash of white box if rendered for any reason.
+  textArea.style.background = 'transparent';
+
+
+  textArea.value = text;
+
+  document.body.appendChild(textArea);
+
+  textArea.select();
+
+  try {
+    var successful = document.execCommand('copy');
+    var msg = successful ? 'successful' : 'unsuccessful';
+    console.log('Copying text command was ' + msg);
+  } catch (err) {
+    console.log('Oops, unable to copy');
+    alert("Unable to copy, sorry");
+  }
+
+  document.body.removeChild(textArea);
 }
