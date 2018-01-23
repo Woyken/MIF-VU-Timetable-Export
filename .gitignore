@@ -101,3 +101,8 @@ ENV/
 #json confing files
 client_secret.json
 lectures2018-spring.json
+
+# Credentials
+.credentials/
+
+
