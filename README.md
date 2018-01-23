@@ -1,8 +1,11 @@
 # Attempt to export timetables from Vilnius University MIF timetable system. (Extra-hacky)
 
 Use javascript script provided in 'Userscript for browser' directly on the page in browser's console. Just copy [the script](https://raw.githubusercontent.com/Woyken/MIF-VU-Timetable-Export/master/Userscript%20for%20browser/MIF%20VU%20Timetable%20exporter.js) to developer's console.
-Exported events data as in json format will be copied to clipboard.
+
+Exported events will be copied to clipboard (json format).
+
 Create file named 'exportedLectures.json' in folder, where python script is located.
+
 Continue to python part in order to import events to Google calendar.
 
 # For google-calendar importing, use the python:
