@@ -2,7 +2,9 @@
 
 Use javascript script provided in 'Userscript for browser' directly on the page in browser's developer's console. 
 
-Navigate to your [group page](https://mif.vu.lt/timetable/mif/groups/612i30001-programu-sistemos-3-k-4-gr-2017/)
+Make sure correct semester is chosen [here](https://mif.vu.lt/timetable/mif/).
+
+Navigate to your [group page](https://mif.vu.lt/timetable/mif/groups/612i30001-programu-sistemos-3-k-4-gr-2017/).
 
 Now just copy [the script](https://raw.githubusercontent.com/Woyken/MIF-VU-Timetable-Export/master/Userscript%20for%20browser/MIF%20VU%20Timetable%20exporter.js) to developer's console.
 
